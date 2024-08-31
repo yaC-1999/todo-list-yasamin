@@ -26,6 +26,22 @@ export default function todolist() {
   const [selectedTask, setSelectedTask] = useState({});
   const [openAlert, setOpenAlert] = useState({ show: false, message: "" });
 
+  const test = [
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: true },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: true },
+    { _id: "1", task: "task1", completed: true },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: false },
+    { _id: "1", task: "task1", completed: false },
+  ];
+
   const url = "http://localhost:3000/api/task";
   useEffect(() => {
     getTask();
@@ -41,6 +57,7 @@ export default function todolist() {
     axios.get(url).then((res) => {
       console.log(res.data.data);
       setTasks(res.data.data);
+      // setTasks(test);
     });
   };
 
@@ -98,138 +115,142 @@ export default function todolist() {
   };
 
   return (
-    <div className="flex flex-col ">
-      <h1 className="text-4xl text-center font-semibold text-blue-600 py-5">
-        To Do List
-      </h1>
-      <div className="w-6/12 m-auto">
-        <div className="grid gap-2">
-          <button
-            className="text-center border w-full p-2 border-gray-300 text-gray-400 hover:text-blue-600 hover:bg-gray-50"
-            onClick={() => handleClickOpenDialog("new")}
-          >
-            <AddIcon />
-          </button>
-          <Collapse in={openAlert.show}>
-            <Alert
-              variant="filled"
-              severity="success"
-              className="fixed bottom-5	right-5"
+    <div className="flex flex-col h-svh bg-blue-600 justify-center items-center ">
+      <div className="flex flex-col w-[480px] h-[510px] bg-white rounded-xl ">
+        <h1 className="text-4xl text-center font-semibold text-blue-600 py-5">
+          To Do List
+        </h1>
+        <div className="p-8 pt-0">
+          <div className="grid gap-2">
+            <button
+              className="text-center p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 bg-gray-50 rounded-lg border border-gray-300 mx-2"
+              onClick={() => handleClickOpenDialog("new")}
             >
-              {openAlert.message}
-            </Alert>
-          </Collapse>
+              <AddIcon />
+            </button>
 
-          <Dialog
-            open={openDialogNewTask}
-            onClose={handleCloseDialogNewTask}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle
-              id="alert-dialog-title"
-              className={
-                (dialogMode === "delete" ? "text-red-600 " : "") + "text-center"
-              }
-            >
-              {dialogMode === "new" ? (
-                "Add New Task"
-              ) : dialogMode === "edit" ? (
-                "Edit " + selectedTask.task
-              ) : (
-                <WarningIcon color="error" fontSize="large" />
-              )}
-            </DialogTitle>
-            <DialogContent>
-              {dialogMode === "delete" ? (
-                <h1 className="flex items-center gap-1">
-                  Are you sure delete{" "}
-                  <span className="font-semibold">{selectedTask.task}</span>?
-                </h1>
-              ) : (
-                <div className="my-2">
-                  <TextField
-                    id="outlined-basic"
-                    label="Title"
-                    variant="outlined"
-                    onChange={handleChangeTask}
-                    defaultValue={selectedTask?.task}
-                  />
+            <div className="grid gap-2 overflow-y-scroll h-[360px] px-2">
+              {tasks.length === 0 ? (
+                <div className=" justify-between w-full h-fit p-2 rounded-lg border border-gray-300 items-center text-center text-gray-500 ">
+                  No Item
                 </div>
+              ) : (
+                tasks.map((item) => {
+                  return (
+                    <div
+                      key={item.id}
+                      className=" flex justify-between w-full h-fit  p-1 items-center rounded-lg border border-gray-300 "
+                    >
+                      <div className="flex gap-2 items-center mx-2 ">
+                        <Checkbox
+                          //   color="success"
+                          fontSize="small"
+                          checked={item.completed}
+                          onChange={() => handleChangeCheckBox(item)}
+                          inputProps={{ "aria-label": "controlled" }}
+                        />
+                        <h1
+                          className={
+                            item.completed ? " opacity-70 line-through " : ""
+                          }
+                        >
+                          {item.task}
+                        </h1>
+                      </div>
+                      {/* <div className="text-xs text-gray-500">2024/05/12</div> */}
+                      <div className="gap-3 flex text-gray-400 p-1">
+                        <button
+                          className="hover:text-blue-600"
+                          onClick={() => handleClickOpenDialog("edit", item)}
+                        >
+                          <EditIcon />
+                        </button>
+                        <button
+                          className="hover:text-blue-600"
+                          onClick={() => handleClickOpenDialog("delete", item)}
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
               )}
-            </DialogContent>
-            <DialogActions>
-              <Button
-                variant="outlined"
-                onClick={handleCloseDialogNewTask}
-                color={dialogMode === "delete" ? "error" : "primary"}
+            </div>
+            <Collapse in={openAlert.show}>
+              <Alert
+                variant="filled"
+                severity="success"
+                className="fixed bottom-5	right-5"
               >
-                Cancle
-              </Button>
-              <Button
-                onClick={handleClickSaveButton}
-                autoFocus
-                variant="contained"
-                color={dialogMode === "delete" ? "error" : "primary"}
-                disabled={
-                  dialogMode === "delete"
-                    ? false
-                    : selectedTask?.task
-                    ? selectedTask.task === task.task || task.task === ""
-                    : task.task === ""
+                {openAlert.message}
+              </Alert>
+            </Collapse>
+
+            <Dialog
+              open={openDialogNewTask}
+              onClose={handleCloseDialogNewTask}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle
+                id="alert-dialog-title"
+                className={
+                  (dialogMode === "delete" ? "text-red-600 " : "") +
+                  "text-center"
                 }
               >
-                {dialogMode === "delete" ? "Delete" : "Save"}
-              </Button>
-            </DialogActions>
-          </Dialog>
-          <div className="grid gap-1">
-            {tasks.length === 0 ? (
-              <div className=" justify-between border w-full p-2 border-gray-300 items-center bg-gray-50 text-center text-gray-500 ">
-                No Item
-              </div>
-            ) : (
-              tasks.map((item) => {
-                return (
-                  <div
-                    key={item.id}
-                    className=" flex justify-between border w-full p-1 border-gray-300 items-center "
-                  >
-                    <div className="flex gap-2 items-center ">
-                      <Checkbox
-                        //   color="success"
-                        fontSize="small"
-                        checked={item.completed}
-                        onChange={() => handleChangeCheckBox(item)}
-                        inputProps={{ "aria-label": "controlled" }}
-                      />
-                      <h1
-                        className={
-                          item.completed ? " opacity-70 line-through " : ""
-                        }
-                      >
-                        {item.task}
-                      </h1>
-                    </div>
-                    {/* <div className="text-xs text-gray-500">2024/05/12</div> */}
-                    <div className="gap-3 flex text-gray-400 p-1">
-                      <button
-                        className="hover:text-blue-600"
-                        onClick={() => handleClickOpenDialog("edit", item)}
-                      >
-                        <EditIcon />
-                      </button>
-                      <button
-                        className="hover:text-blue-600"
-                        onClick={() => handleClickOpenDialog("delete", item)}
-                      >
-                        <DeleteIcon />
-                      </button>
-                    </div>
+                {dialogMode === "new" ? (
+                  "Add New Task"
+                ) : dialogMode === "edit" ? (
+                  "Edit " + selectedTask.task
+                ) : (
+                  <WarningIcon color="error" fontSize="large" />
+                )}
+              </DialogTitle>
+              <DialogContent>
+                {dialogMode === "delete" ? (
+                  <h1 className="flex items-center gap-1">
+                    Are you sure delete{" "}
+                    <span className="font-semibold">{selectedTask.task}</span>?
+                  </h1>
+                ) : (
+                  <div className="my-2">
+                    <TextField
+                      id="outlined-basic"
+                      label="Title"
+                      variant="outlined"
+                      onChange={handleChangeTask}
+                      defaultValue={selectedTask?.task}
+                    />
                   </div>
-                );
-              })
-            )}
+                )}
+              </DialogContent>
+              <DialogActions className="p-5">
+                <Button
+                  variant="outlined"
+                  onClick={handleCloseDialogNewTask}
+                  color={dialogMode === "delete" ? "error" : "primary"}
+                >
+                  Cancle
+                </Button>
+                <Button
+                  onClick={handleClickSaveButton}
+                  autoFocus
+                  variant="contained"
+                  color={dialogMode === "delete" ? "error" : "primary"}
+                  disabled={
+                    dialogMode === "delete"
+                      ? false
+                      : selectedTask?.task
+                      ? selectedTask.task === task.task || task.task === ""
+                      : task.task === ""
+                  }
+                >
+                  {dialogMode === "delete" ? "Delete" : "Save"}
+                </Button>
+              </DialogActions>
+            </Dialog>
           </div>
         </div>
       </div>

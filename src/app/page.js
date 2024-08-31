@@ -20,7 +20,6 @@ import axios from "axios";
 
 export default function todolist() {
   const [tasks, setTasks] = useState([]);
-  const [checked, setChecked] = useState(true);
   const [openDialogNewTask, setOpenDialogNewTask] = useState(false);
   const [dialogMode, setDialogMode] = useState("");
   const [task, setTask] = useState({ task: "" });
